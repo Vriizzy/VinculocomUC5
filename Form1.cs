@@ -16,6 +16,7 @@ namespace VinculocomUC5
         private OpenFileDialog leitura = new OpenFileDialog();
         private SaveFileDialog salvamento = new SaveFileDialog();
         private string caminho;
+        protected Pessoa pessoa = null;
         public Form1()
         {
             InitializeComponent();
@@ -33,6 +34,8 @@ namespace VinculocomUC5
 
         private void btnObterDados_Click(object sender, EventArgs e)
         {
+            leitura.Filter = "|*.txt";
+            leitura.Title = "Selecione o arquivo que contem os dados";
             //Vamos voltar nessa linha - 1
             leitura.Title = "Selecione o arquivo que contem os dados";
             // Verificar se deu tudo certo ao clicar em ok após selecionar o dado
@@ -51,8 +54,16 @@ namespace VinculocomUC5
                 //Extrair texto e coloca dentro do vetor
                 string[] linhas = textoLido.ToString().Split('\n');
                 //for (int i=0; i < linhas.lenght;i++)
-                foreach (string linha in linhas) lboDados.Items.Add(linha);
-
+                //foreach (string linha in linhas) lboDados.Items.Add(linha);
+                for(int i = 0; i < linhas.Length; i= i + 4)
+                {
+                    string nome = linhas[i];
+                    char sexo = linhas[i + 1].ToString()[0];
+                    string escolaridade = linhas[i + 2];
+                    string classe = linhas[i + 3];
+                    Pessoa pessoa = new Pessoa(nome, sexo, escolaridade, classe);
+                    lboDados.Items.Add(pessoa);
+                }
 
             }
             // caso qualquer erro no try, vou pegar esse erro
@@ -60,6 +71,29 @@ namespace VinculocomUC5
             {
                 MessageBox.Show("erro.Message");
             }
+        }
+
+        private void lboDados_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //MessageBox.Show("clicou");
+            Pessoa antigaPessoa = (sender as ListBox).SelectedItem as Pessoa;
+            if (antigaPessoa == null) return;
+            Pessoa novaPessoa;
+            using (Cadastro cadastro = new Cadastro(antigaPessoa)) {
+                cadastro.ShowDialog();
+                novaPessoa = cadastro.pessoa;
+            }
+            lboDados.ClearSelected();
+            for(int i = 0; i < lboDados.Items.Count; i++)
+            {
+                if (lboDados.Items[i] == antigaPessoa)
+                {
+                    lboDados.Items[i] = novaPessoa;
+                    break;
+                }
+
+            }
+            lboDados.Update();
         }
     }
 }

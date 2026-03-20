@@ -49,6 +49,7 @@
             this.lboDados.Name = "lboDados";
             this.lboDados.Size = new System.Drawing.Size(574, 212);
             this.lboDados.TabIndex = 1;
+            this.lboDados.SelectedIndexChanged += new System.EventHandler(this.lboDados_SelectedIndexChanged);
             // 
             // Form1
             // 

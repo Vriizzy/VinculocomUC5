@@ -6,13 +6,31 @@ using System.Threading.Tasks;
 
 namespace VinculocomUC5
 {
-    internal class Pessoa
+    public class Pessoa
     {
         // private -> este cara foca vosoveç apenas no Pessoa.cs
         private string _nome;
         private char _sexo;
         private string _escolaridade;
         private string _classe;
+        public string Nome 
+        { 
+            get { return _nome; }
+        }
+
+        public string Escolaridade
+        {
+            get { return _escolaridade; }
+        }
+        public char Sexo
+        {
+            get { return _sexo; }
+        }
+        public string Classe
+        {
+            get { return _classe; }
+        }
+
         /// <summary>
         /// construindo a identidade em outro codigo
         /// </summary>
@@ -28,5 +46,17 @@ namespace VinculocomUC5
             this._escolaridade = escolaridade;
             this._classe = classe;
         }
+        public override string ToString() => _nome;
+
+        //return _nome;
+        public void atualizarCampos(string nome, string escolaridade, char sexo, string classe)
+        {
+            _nome = nome;
+            _sexo = sexo;
+            _escolaridade = escolaridade;
+            _classe = classe;
+
+        }
+
     }
 }
