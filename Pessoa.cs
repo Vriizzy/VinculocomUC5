@@ -46,7 +46,7 @@ namespace VinculocomUC5
             this._escolaridade = escolaridade;
             this._classe = classe;
         }
-        public override string ToString() => _nome;
+ 
 
         //return _nome;
         public void atualizarCampos(string nome, string escolaridade, char sexo, string classe)
@@ -57,6 +57,7 @@ namespace VinculocomUC5
             _classe = classe;
 
         }
+        public override string ToString() => _nome;
 
     }
 }

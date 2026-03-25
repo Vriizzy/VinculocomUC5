@@ -13,8 +13,8 @@ namespace VinculocomUC5
 {
     public partial class Form1 : Form
     {
-        private OpenFileDialog leitura = new OpenFileDialog();
-        private SaveFileDialog salvamento = new SaveFileDialog();
+        private OpenFileDialog Leitura = new OpenFileDialog();
+        private SaveFileDialog Salvamento = new SaveFileDialog();
         private string caminho;
         protected Pessoa pessoa = null;
         public Form1()
@@ -22,78 +22,176 @@ namespace VinculocomUC5
             InitializeComponent();
         }
         /// <summary>
-        /// Ao clicar, o codigo ira visualizar os dados
+        /// ao clucar, o codigo ira visualizar os dados
         /// </summary>
-        /// <param name="sender">Botão de btnObterDados</param>
-        /// <param name="e">o evento de clik</param>
+        /// <param name="sender">botao de btnDados</param>
+        /// <param name="e">o evento de click</param>
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void btnDados_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void btnObterDados_Click(object sender, EventArgs e)
-        {
-            leitura.Filter = "|*.txt";
-            leitura.Title = "Selecione o arquivo que contem os dados";
-            //Vamos voltar nessa linha - 1
-            leitura.Title = "Selecione o arquivo que contem os dados";
-            // Verificar se deu tudo certo ao clicar em ok após selecionar o dado
-            // Se ao obter o caminho o caminho deu certo, continua, caso contrario encerra
-            if (leitura.ShowDialog() != DialogResult.OK) return;
-            //Obtendo o caminho do arquivo
-            caminho = leitura.FileName;
-            //Tenta executar o trecho do codigo
+            Leitura.Filter = "|*.txt";
+            Leitura.Title = "Selecione o arquivo de dados";
+            //vamos voltar nessa linha - 1
+            //verificar se deu tudo certo ao clicar em ok, apos selecionar o dado
+            //se ao obter o caminho o caminho deu certo,continua caso contrario encerra
+            if (Leitura.ShowDialog() != DialogResult.OK) return;
+            //obtendo o caminho do arquivo
+            caminho = Leitura.FileName;
+            //crie uma variavel, que o tipo é desconhecido
             try
             {
-                // ao digitar o camndo, lembre-se de clicar na lampada com x
-                //Depois em using System.IO;
-                // A criação de variavel com var, precisa da atribuição na sequencia
-                //O File ira fazer a leitura dos dados dentro do arquivo que passei o caminho
+                //ao digitar o comando, lembre-se de clicar com x
+                //depois em system.IO;
+                //a criaçao de variavel com var, precisa da atribuicao na sequencia
+                //o file, ira fazer a leitura dos dados dentro do arquivo que passei o caminho
                 var textoLido = File.ReadAllText(caminho);
-                //Extrair texto e coloca dentro do vetor
+                //extrair texto
                 string[] linhas = textoLido.ToString().Split('\n');
-                //for (int i=0; i < linhas.lenght;i++)
-                //foreach (string linha in linhas) lboDados.Items.Add(linha);
-                for(int i = 0; i < linhas.Length; i= i + 4)
+                for (int i = 0; i < linhas.Length; i = i + 4)
                 {
                     string nome = linhas[i];
                     char sexo = linhas[i + 1].ToString()[0];
                     string escolaridade = linhas[i + 2];
                     string classe = linhas[i + 3];
-                    Pessoa pessoa = new Pessoa(nome, sexo, escolaridade, classe);
-                    lboDados.Items.Add(pessoa);
+                    Pessoa novapessoa = new Pessoa(nome, sexo, escolaridade, classe);
+                    lboDados.Items.Add(novapessoa);
                 }
 
+
             }
-            // caso qualquer erro no try, vou pegar esse erro
+            // caso aconteça qualquer erro no try, vou pegar o erro
             catch (Exception erro)
             {
-                MessageBox.Show("erro.Message");
+                //qualquer erro que aparecer, vou visualizar
+                MessageBox.Show(erro.Message);
+            }
+        }
+
+        /// <summary>
+        /// pode modificar os dados, basta clicar no dado que deseja modificar, e clicar em ok, para salvar as modificações
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+
+    
+
+        private void btnSalvar_Click(object sender, EventArgs e)
+        {
+            if (caminho == null) return;
+            StreamWriter salvarArquivo = new StreamWriter(caminho);
+            string texto = "";
+            foreach (Pessoa pessoa in lboDados.Items)
+            {
+                texto += pessoa.Nome + "\n";
+                texto += pessoa.Sexo == 'F' ? "Feminino" : "Masculino\n";
+                texto += pessoa.Escolaridade;
+                texto += pessoa.Classe + "\n";
+            }
+
+        }
+
+        private void btnInserir_Click(object sender, EventArgs e)
+        {
+            Pessoa novapessoa;
+            using (Cadastro cadastro = new Cadastro())
+            {
+                cadastro.ShowDialog();
+                novapessoa = cadastro.pessoa;
+            }
+            if (novapessoa != null) return;
+            lboDados.Items.Add(novapessoa);
+            lboDados.Update();
+        }
+
+        private void btnSalvarComo_Click(object sender, EventArgs e)
+        {
+            if (lboDados.Items.Count == 0) return;
+            Salvamento.Filter = "Arquivo |*.txt!*.txt";
+            Salvamento.FileName = "Selecione o local para salvar o arquivo";
+            if (Salvamento.ShowDialog() != DialogResult.OK &&
+                Salvamento.FileName == null) return;
+            FileStream abrirArquivo = Salvamento.OpenFile() as FileStream;
+            StreamWriter salvandoArquivo = new StreamWriter(abrirArquivo);
+            string texto = "";
+            foreach (Pessoa pessoa in lboDados.Items)
+            {
+                texto += pessoa.Nome + "\n";
+                texto += pessoa.Sexo == 'F' ? "Feminino" : "Masculino\n";
+                texto += pessoa.Escolaridade;
+                texto += pessoa.Classe + "\n";
             }
         }
 
         private void lboDados_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //MessageBox.Show("clicou");
-            Pessoa antigaPessoa = (sender as ListBox).SelectedItem as Pessoa;
-            if (antigaPessoa == null) return;
-            Pessoa novaPessoa;
-            using (Cadastro cadastro = new Cadastro(antigaPessoa)) {
+            Pessoa AntigaPessoa = (sender as ListBox).SelectedItem as Pessoa;
+            if (AntigaPessoa == null) return;
+            Pessoa novapessoa;
+            using (Cadastro cadastro = new Cadastro(AntigaPessoa))
+            {
                 cadastro.ShowDialog();
-                novaPessoa = cadastro.pessoa;
+                novapessoa = cadastro.pessoa;
             }
             lboDados.ClearSelected();
-            for(int i = 0; i < lboDados.Items.Count; i++)
+            if (novapessoa == null)
+                lboDados.Items.Remove(AntigaPessoa);
+            else
             {
-                if (lboDados.Items[i] == antigaPessoa)
+                for (int i = 0; i < lboDados.Items.Count; i++)
                 {
-                    lboDados.Items[i] = novaPessoa;
-                    break;
+                    if (lboDados.Items[i] == AntigaPessoa)
+                    {
+                        lboDados.Items[i] = novapessoa;
+                        break;
+                    }
                 }
-
             }
             lboDados.Update();
+
+
+        
+    }
+
+        private void btnObterDados_Click(object sender, EventArgs e)
+        {
+            Leitura.Filter = "|*.txt";
+            Leitura.Title = "Selecione o arquivo de dados";
+            //vamos voltar nessa linha - 1
+            //verificar se deu tudo certo ao clicar em ok, apos selecionar o dado
+            //se ao obter o caminho o caminho deu certo,continua caso contrario encerra
+            if (Leitura.ShowDialog() != DialogResult.OK) return;
+            //obtendo o caminho do arquivo
+            caminho = Leitura.FileName;
+            //crie uma variavel, que o tipo é desconhecido
+            try
+            {
+                //ao digitar o comando, lembre-se de clicar com x
+                //depois em system.IO;
+                //a criaçao de variavel com var, precisa da atribuicao na sequencia
+                //o file, ira fazer a leitura dos dados dentro do arquivo que passei o caminho
+                var textoLido = File.ReadAllText(caminho);
+                //extrair texto
+                string[] linhas = textoLido.ToString().Split('\n');
+                for (int i = 0; i < linhas.Length; i = i + 4)
+                {
+                    string nome = linhas[i];
+                    char sexo = linhas[i + 1].ToString()[0];
+                    string escolaridade = linhas[i + 2];
+                    string classe = linhas[i + 3];
+                    Pessoa novapessoa = new Pessoa(nome, sexo, escolaridade, classe);
+                    lboDados.Items.Add(novapessoa);
+                }
+
+
+            }
+            // caso aconteça qualquer erro no try, vou pegar o erro
+            catch (Exception erro)
+            {
+                //qualquer erro que aparecer, vou visualizar
+                MessageBox.Show(erro.Message);
+            }
         }
     }
-}
+    }
+
+
